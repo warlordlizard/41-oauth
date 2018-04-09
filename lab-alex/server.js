@@ -1,8 +1,8 @@
 'use strict';
 
 const express = require('express');
-const dotenv = require('dotenv');
 const superagent = require('superagent');
+const dotenv = require('dotenv');
 const app = express();
 
 dotenv.load();
@@ -18,15 +18,16 @@ app.get('/oauth/google/code', function(req, res) {
         grant_type: 'authorization_code',
         client_id: process.env.CLIENT_ID,
         client_secret: process.env.CLIENT_SECRET,
-        redirect_uri: `${process.env.API_URL}/oauth.google.code`,
+        redirect_uri: `${process.env.API_URL}/oauth/google/code`,
       })
-      .then( response => {
+      .then(response => {
         console.log('req', response.body);
-        return superagent.get('https://www.googleapis.com/plus/vi/people/me/openIdConnect')
-          .set('Authoization, `Bearer ${response.body.access_token}');
+        return superagent.get('https://www.googleapis.com/plus/v1/people/me/openIdConnect')
+          .set('Authorization', `Bearer ${response.body.access_token}`);
       })
       .then(response => {
         console.log('open ID', response.body);
+        res.cookie('X-Some-Cookie', 'some token') ;
         res.redirect(process.env.CLIENT_URL);
       });
   }
